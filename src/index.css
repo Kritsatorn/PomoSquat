@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+/* RetroUI Theme Variables - Yellow/Black NeoBrutalism */
+:root {
+  --background: #fef3c7;
+  --foreground: #1c1917;
+  --primary: #fbbf24;
+  --primary-hover: #f59e0b;
+  --secondary: #fde68a;
+  --border: #1c1917;
+  --shadow: 4px 4px 0px #1c1917;
+  --shadow-sm: 2px 2px 0px #1c1917;
+  --radius: 0px;
+
+  /* Font families */
+  --font-heading: 'Archivo Black', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Squat Character Animations */
+@keyframes idle-breathe {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes squat {
+  0%, 100% {
+    transform: scaleY(1) translateY(0);
+  }
+  50% {
+    transform: scaleY(0.75) translateY(12px);
+  }
+}
+
+@keyframes squat-warning-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.character-idle {
+  animation: idle-breathe 2s ease-in-out infinite;
+}
+
+.character-squatting {
+  animation: squat 0.8s ease-in-out 3;
+  transform-origin: bottom center;
+}
+
+.squat-warning {
+  animation: squat-warning-pulse 0.5s ease-in-out infinite;
+}
