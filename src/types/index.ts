@@ -11,6 +11,8 @@ export interface Task {
   text: string
   completed: boolean
   createdAt: number
+  estimatedPomodoros?: number
+  completedPomodoros?: number
 }
 
 export interface TimerState {

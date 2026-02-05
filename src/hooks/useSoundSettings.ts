@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react'
-import { playSound } from '@/utils/sounds'
+import { useState, useCallback, useRef } from 'react'
+import { playSound, playTickSound, startSoundLoop } from '@/utils/sounds'
 import type { SoundType } from '@/utils/sounds'
 
 const STORAGE_KEY = 'pomosquat-sound-settings'
@@ -7,6 +7,7 @@ const STORAGE_KEY = 'pomosquat-sound-settings'
 export interface SoundSettings {
   enabled: boolean
   volume: number // 0-1
+  alarmVolume: number // 0-1
   pomodoroSound: SoundType
   squatSound: SoundType
 }
@@ -14,6 +15,7 @@ export interface SoundSettings {
 const DEFAULT_SETTINGS: SoundSettings = {
   enabled: true,
   volume: 0.7,
+  alarmVolume: 0.5,
   pomodoroSound: 'pixel-bell',
   squatSound: 'pixel-alert',
 }
@@ -40,6 +42,7 @@ function saveSettings(settings: SoundSettings): void {
 
 export function useSoundSettings() {
   const [settings, setSettings] = useState<SoundSettings>(loadSettings)
+  const loopCleanupRef = useRef<(() => void) | null>(null)
 
   const updateSettings = useCallback((updates: Partial<SoundSettings>) => {
     setSettings((prev) => {
@@ -55,6 +58,10 @@ export function useSoundSettings() {
 
   const setVolume = useCallback((volume: number) => {
     updateSettings({ volume: Math.max(0, Math.min(1, volume)) })
+  }, [updateSettings])
+
+  const setAlarmVolume = useCallback((alarmVolume: number) => {
+    updateSettings({ alarmVolume: Math.max(0, Math.min(1, alarmVolume)) })
   }, [updateSettings])
 
   const setPomodoroSound = useCallback((sound: SoundType) => {
@@ -77,18 +84,45 @@ export function useSoundSettings() {
     }
   }, [settings.enabled, settings.squatSound, settings.volume])
 
+  const playTick = useCallback(() => {
+    if (settings.enabled) {
+      playTickSound(settings.volume)
+    }
+  }, [settings.enabled, settings.volume])
+
   const previewSound = useCallback((soundType: SoundType) => {
     playSound(soundType, settings.volume)
   }, [settings.volume])
+
+  const startPomodoroSoundLoop = useCallback(() => {
+    // Stop any existing loop first
+    if (loopCleanupRef.current) {
+      loopCleanupRef.current()
+    }
+    if (settings.enabled) {
+      loopCleanupRef.current = startSoundLoop(settings.pomodoroSound, settings.alarmVolume, 3000)
+    }
+  }, [settings.enabled, settings.pomodoroSound, settings.alarmVolume])
+
+  const stopSoundLoop = useCallback(() => {
+    if (loopCleanupRef.current) {
+      loopCleanupRef.current()
+      loopCleanupRef.current = null
+    }
+  }, [])
 
   return {
     settings,
     toggleEnabled,
     setVolume,
+    setAlarmVolume,
     setPomodoroSound,
     setSquatSound,
     playPomodoroSound,
     playSquatSound,
+    playTick,
     previewSound,
+    startPomodoroSoundLoop,
+    stopSoundLoop,
   }
 }

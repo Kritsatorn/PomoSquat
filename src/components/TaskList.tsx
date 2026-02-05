@@ -35,9 +35,11 @@ function saveSelectedTaskId(id: string | null) {
 
 interface TaskListProps {
   onSelectedTaskChange: (task: Task | null) => void
+  onAddTaskRef?: (addTask: () => void) => void
+  onIncrementPomodoroRef?: (fn: () => void) => void
 }
 
-export function TaskList({ onSelectedTaskChange }: TaskListProps) {
+export function TaskList({ onSelectedTaskChange, onAddTaskRef, onIncrementPomodoroRef }: TaskListProps) {
   const [tasks, setTasks] = useState<Task[]>(loadTasks)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(loadSelectedTaskId)
   const [newTaskText, setNewTaskText] = useState('')
@@ -54,6 +56,12 @@ export function TaskList({ onSelectedTaskChange }: TaskListProps) {
     const selectedTask = tasks.find((t) => t.id === selectedTaskId) || null
     onSelectedTaskChange(selectedTask)
   }, [selectedTaskId, tasks, onSelectedTaskChange])
+
+  useEffect(() => {
+    if (onAddTaskRef) {
+      onAddTaskRef(() => setIsAdding(true))
+    }
+  }, [onAddTaskRef])
 
   const addTask = () => {
     if (!newTaskText.trim()) return
@@ -88,6 +96,34 @@ export function TaskList({ onSelectedTaskChange }: TaskListProps) {
   const selectTask = (id: string) => {
     setSelectedTaskId((prev) => (prev === id ? null : id))
   }
+
+  const updateTaskEstimate = (id: string, estimate: number) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, estimatedPomodoros: estimate } : task
+      )
+    )
+  }
+
+  const incrementTaskPomodoro = (id: string) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id
+          ? { ...task, completedPomodoros: (task.completedPomodoros ?? 0) + 1 }
+          : task
+      )
+    )
+  }
+
+  useEffect(() => {
+    if (onIncrementPomodoroRef) {
+      onIncrementPomodoroRef(() => {
+        if (selectedTaskId) {
+          incrementTaskPomodoro(selectedTaskId)
+        }
+      })
+    }
+  }, [onIncrementPomodoroRef, selectedTaskId])
 
   const handleDragStart = (index: number) => {
     dragItem.current = index
@@ -164,7 +200,7 @@ export function TaskList({ onSelectedTaskChange }: TaskListProps) {
 
       <div className="space-y-3">
         {tasks.length === 0 ? (
-          <p className="text-center text-gray-500 py-6">
+          <p className="text-center text-[var(--text-muted)] py-6">
             No tasks yet. Add one to get started!
           </p>
         ) : (
@@ -177,6 +213,7 @@ export function TaskList({ onSelectedTaskChange }: TaskListProps) {
               onToggle={toggleTask}
               onDelete={deleteTask}
               onSelect={selectTask}
+              onUpdateEstimate={updateTaskEstimate}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={handleDrop}

@@ -12,9 +12,33 @@
   --shadow-sm: 2px 2px 0px #1c1917;
   --radius: 0px;
 
+  /* Card and surface colors */
+  --card-bg: #ffffff;
+  --card-secondary: #fde68a;
+  --input-bg: #fef3c7;
+  --text-muted: #6b7280;
+
   /* Font families */
   --font-heading: 'Archivo Black', sans-serif;
   --font-body: 'Space Grotesk', sans-serif;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --background: #1c1917;
+  --foreground: #fef3c7;
+  --primary: #fbbf24;
+  --primary-hover: #f59e0b;
+  --secondary: #44403c;
+  --border: #fef3c7;
+  --shadow: 4px 4px 0px #fef3c7;
+  --shadow-sm: 2px 2px 0px #fef3c7;
+
+  /* Card and surface colors */
+  --card-bg: #292524;
+  --card-secondary: #44403c;
+  --input-bg: #292524;
+  --text-muted: #a8a29e;
 }
 
 /* Base styles */
@@ -84,4 +108,50 @@ h1, h2, h3, h4, h5, h6 {
 
 .squat-warning {
   animation: squat-warning-pulse 0.5s ease-in-out infinite;
+}
+
+/* Alarm Overlay Animations */
+@keyframes alarm-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 6px 6px 0px var(--border);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 8px 8px 0px var(--border);
+  }
+}
+
+@keyframes alarm-bell-shake {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+.alarm-card {
+  animation: alarm-pulse 1s ease-in-out infinite;
+}
+
+.alarm-card svg {
+  animation: alarm-bell-shake 0.5s ease-in-out infinite;
+}
+
+/* Pause Indicator Animation */
+@keyframes pause-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pause-indicator {
+  animation: pause-pulse 1.5s ease-in-out infinite;
 }

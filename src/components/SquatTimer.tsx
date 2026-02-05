@@ -11,15 +11,19 @@ interface SquatTimerProps {
   isDoingSquats: boolean
   squatInterval: number
   soundSettings: SoundSettingsType
+  notificationsEnabled?: boolean
+  notificationsSupported?: boolean
   onStartSquats: () => void
   onCompleteSquats: () => void
   onConfigureInterval: (minutes: number) => void
   onToggleSoundEnabled: () => void
   onVolumeChange: (volume: number) => void
+  onAlarmVolumeChange: (volume: number) => void
   onPomodoroSoundChange: (sound: SoundType) => void
   onSquatSoundChange: (sound: SoundType) => void
   onPreviewSound: (sound: SoundType) => void
   onPlaySquatSound: () => void
+  onToggleNotifications?: () => void
 }
 
 const INTERVAL_OPTIONS = [15, 20, 30, 45, 60]
@@ -31,15 +35,19 @@ export function SquatTimer({
   isDoingSquats,
   squatInterval,
   soundSettings,
+  notificationsEnabled,
+  notificationsSupported,
   onStartSquats,
   onCompleteSquats,
   onConfigureInterval,
   onToggleSoundEnabled,
   onVolumeChange,
+  onAlarmVolumeChange,
   onPomodoroSoundChange,
   onSquatSoundChange,
   onPreviewSound,
   onPlaySquatSound,
+  onToggleNotifications,
 }: SquatTimerProps) {
   const [showSettings, setShowSettings] = useState(false)
 
@@ -64,9 +72,9 @@ export function SquatTimer({
         alignItems: 'center',
         gap: '24px',
         padding: '32px',
-        backgroundColor: '#fde68a',
-        border: '4px solid #1c1917',
-        boxShadow: '6px 6px 0px #1c1917',
+        backgroundColor: 'var(--card-secondary)',
+        border: '4px solid var(--border)',
+        boxShadow: '6px 6px 0px var(--border)',
         minWidth: '220px',
       }}
     >
@@ -90,7 +98,7 @@ export function SquatTimer({
           style={{
             fontFamily: 'var(--font-body)',
             fontSize: '16px',
-            color: '#1c1917',
+            color: 'var(--foreground)',
           }}
         >
           Next squat in:
@@ -100,7 +108,7 @@ export function SquatTimer({
           style={{
             fontFamily: 'var(--font-heading)',
             fontSize: '32px',
-            color: isWarning ? '#dc2626' : '#1c1917',
+            color: isWarning ? '#dc2626' : 'var(--foreground)',
             fontWeight: 'bold',
           }}
         >
@@ -117,14 +125,14 @@ export function SquatTimer({
         disabled={isDoingSquats}
         style={{
           padding: '12px 24px',
-          backgroundColor: isDoingSquats ? '#d1d5db' : '#22c55e',
-          border: '3px solid #1c1917',
-          boxShadow: isDoingSquats ? 'none' : '3px 3px 0px #1c1917',
+          backgroundColor: isDoingSquats ? 'var(--secondary)' : '#22c55e',
+          border: '3px solid var(--border)',
+          boxShadow: isDoingSquats ? 'none' : '3px 3px 0px var(--border)',
           cursor: isDoingSquats ? 'not-allowed' : 'pointer',
           fontFamily: 'var(--font-body)',
           fontSize: '14px',
           fontWeight: 'bold',
-          color: isDoingSquats ? '#6b7280' : '#fff',
+          color: isDoingSquats ? 'var(--text-muted)' : '#fff',
         }}
       >
         {isDoingSquats ? 'Squatting...' : 'Do Squats!'}
@@ -136,9 +144,9 @@ export function SquatTimer({
           onClick={() => setShowSettings(!showSettings)}
           style={{
             padding: '12px 20px',
-            backgroundColor: '#fbbf24',
-            border: '3px solid #1c1917',
-            boxShadow: '3px 3px 0px #1c1917',
+            backgroundColor: 'var(--primary)',
+            border: '3px solid var(--border)',
+            boxShadow: '3px 3px 0px var(--border)',
             cursor: 'pointer',
             fontFamily: 'var(--font-body)',
             fontSize: '14px',
@@ -159,9 +167,9 @@ export function SquatTimer({
               left: '50%',
               transform: 'translateX(-50%)',
               marginBottom: '8px',
-              backgroundColor: '#fef3c7',
-              border: '3px solid #1c1917',
-              boxShadow: '4px 4px 0px #1c1917',
+              backgroundColor: 'var(--card-bg)',
+              border: '3px solid var(--border)',
+              boxShadow: '4px 4px 0px var(--border)',
               padding: '16px',
               zIndex: 10,
               minWidth: '240px',
@@ -192,8 +200,9 @@ export function SquatTimer({
                   onClick={() => handleIntervalChange(minutes)}
                   style={{
                     padding: '6px 12px',
-                    backgroundColor: squatInterval === minutes ? '#fbbf24' : 'transparent',
-                    border: '2px solid #1c1917',
+                    backgroundColor: squatInterval === minutes ? 'var(--primary)' : 'transparent',
+                    border: '2px solid var(--border)',
+                    color: 'var(--foreground)',
                     cursor: 'pointer',
                     fontFamily: 'var(--font-body)',
                     fontSize: '13px',
@@ -208,7 +217,7 @@ export function SquatTimer({
             <div
               style={{
                 height: '2px',
-                backgroundColor: '#1c1917',
+                backgroundColor: 'var(--border)',
                 margin: '16px 0',
               }}
             />
@@ -216,11 +225,15 @@ export function SquatTimer({
             {/* Sound Settings */}
             <SoundSettings
               settings={soundSettings}
+              notificationsEnabled={notificationsEnabled}
+              notificationsSupported={notificationsSupported}
               onToggleEnabled={onToggleSoundEnabled}
               onVolumeChange={onVolumeChange}
+              onAlarmVolumeChange={onAlarmVolumeChange}
               onPomodoroSoundChange={onPomodoroSoundChange}
               onSquatSoundChange={onSquatSoundChange}
               onPreviewSound={onPreviewSound}
+              onToggleNotifications={onToggleNotifications}
             />
           </div>
         )}
