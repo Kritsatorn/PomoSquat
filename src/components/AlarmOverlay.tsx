@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import type { AlarmType } from '@/hooks/useAlarm'
 
@@ -30,7 +31,6 @@ function PixelBellIcon() {
       className="mx-auto mb-4"
       style={{ imageRendering: 'pixelated' }}
     >
-      {/* Bell body */}
       <rect x="6" y="1" width="4" height="2" fill="currentColor" />
       <rect x="5" y="3" width="6" height="1" fill="currentColor" />
       <rect x="4" y="4" width="8" height="1" fill="currentColor" />
@@ -41,7 +41,6 @@ function PixelBellIcon() {
       <rect x="2" y="9" width="12" height="1" fill="currentColor" />
       <rect x="2" y="10" width="12" height="1" fill="currentColor" />
       <rect x="1" y="11" width="14" height="1" fill="currentColor" />
-      {/* Bell clapper */}
       <rect x="7" y="13" width="2" height="2" fill="currentColor" />
     </svg>
   )
@@ -85,8 +84,11 @@ export function AlarmOverlay({
   const showLongBreakSuggestion = alarmType === 'pomodoro' && suggestLongBreak
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="alarm-card bg-[var(--primary)] border-[4px] border-[var(--border)] shadow-[6px_6px_0px_var(--border)] p-10 text-center max-w-sm mx-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <Card
+        variant="elevated"
+        className="alarm-card bg-[var(--primary)] p-10 text-center max-w-sm w-full"
+      >
         <PixelBellIcon />
 
         <h2 className="text-4xl font-[var(--font-heading)] mb-2">
@@ -98,7 +100,7 @@ export function AlarmOverlay({
         </p>
 
         {showLongBreakSuggestion && (
-          <div className="mb-6 p-3 bg-[var(--card-bg)] border-2 border-[var(--border)]">
+          <div className="mb-6 p-4 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-xl">
             <p className="text-sm font-medium">
               {completedPomodoros} pomodoros completed!
             </p>
@@ -114,7 +116,7 @@ export function AlarmOverlay({
               size="lg"
               variant="primary"
               onClick={handleStartLongBreak}
-              className="w-full text-lg"
+              className="w-full text-lg bg-[var(--card-bg)] hover:bg-[var(--secondary)]"
             >
               TAKE LONG BREAK
             </Button>
@@ -128,7 +130,7 @@ export function AlarmOverlay({
             {showLongBreakSuggestion ? 'DISMISS' : 'DISMISS ALARM'}
           </Button>
         </div>
-      </div>
+      </Card>
     </div>
   )
 }

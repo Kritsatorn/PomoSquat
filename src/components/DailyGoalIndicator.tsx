@@ -26,83 +26,44 @@ export function DailyGoalIndicator({
     <div className="relative">
       <button
         onClick={() => setShowSettings(!showSettings)}
-        className="flex items-center gap-2 px-3 py-2"
-        style={{
-          backgroundColor: 'var(--card-bg)',
-          border: '2px solid var(--border)',
-          cursor: 'pointer',
-        }}
+        className="flex items-center gap-2 px-3 py-2 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-xl hover:bg-[var(--secondary)] transition-colors cursor-pointer"
         title="Daily goal progress"
       >
-        {/* Progress circles */}
         <div className="flex gap-1">
           {Array.from({ length: Math.min(target, 10) }).map((_, i) => (
             <div
               key={i}
-              style={{
-                width: '10px',
-                height: '10px',
-                border: '2px solid var(--border)',
-                backgroundColor: i < completed ? 'var(--primary)' : 'transparent',
-              }}
+              className={`w-2.5 h-2.5 border-2 border-[var(--border)] rounded-sm ${
+                i < completed ? 'bg-[var(--primary)]' : 'bg-transparent'
+              }`}
             />
           ))}
           {target > 10 && (
-            <span
-              style={{
-                fontSize: '12px',
-                fontFamily: 'var(--font-body)',
-                marginLeft: '2px',
-              }}
-            >
-              +{target - 10}
-            </span>
+            <span className="text-xs ml-0.5">+{target - 10}</span>
           )}
         </div>
 
-        {/* Count display */}
         <span
-          style={{
-            fontSize: '14px',
-            fontFamily: 'var(--font-body)',
-            fontWeight: 'bold',
-            color: isGoalMet ? '#22c55e' : 'var(--foreground)',
-          }}
+          className={`text-sm font-bold ${isGoalMet ? 'text-emerald-500' : ''}`}
         >
           {completed}/{target}
         </span>
 
         {isGoalMet && (
-          <span style={{ fontSize: '14px' }} title="Goal complete!">
+          <span className="text-sm" title="Goal complete!">
             ✓
           </span>
         )}
       </button>
 
-      {/* Settings dropdown */}
       {showSettings && (
         <>
           <div
             className="fixed inset-0 z-40"
             onClick={() => setShowSettings(false)}
           />
-          <div
-            className="absolute left-0 top-full mt-2 z-50 p-3"
-            style={{
-              backgroundColor: 'var(--card-bg)',
-              border: '3px solid var(--border)',
-              boxShadow: 'var(--shadow)',
-              minWidth: '200px',
-            }}
-          >
-            <p
-              style={{
-                fontSize: '14px',
-                fontFamily: 'var(--font-body)',
-                fontWeight: '600',
-                marginBottom: '8px',
-              }}
-            >
+          <div className="absolute left-0 top-full mt-2 z-50 p-4 bg-[var(--card-bg)] border-2 border-[var(--border)] rounded-xl shadow-[6px_6px_0_var(--border)] min-w-[200px]">
+            <p className="text-sm font-semibold mb-3">
               Daily Goal: {target} pomodoros
             </p>
             <div className="flex flex-wrap gap-2">
@@ -110,26 +71,23 @@ export function DailyGoalIndicator({
                 <button
                   key={opt}
                   onClick={() => onTargetChange(opt)}
-                  style={{
-                    padding: '4px 10px',
-                    fontSize: '13px',
-                    backgroundColor: target === opt ? 'var(--primary)' : 'transparent',
-                    border: '2px solid var(--border)',
-                    cursor: 'pointer',
-                    color: 'var(--foreground)',
-                  }}
+                  className={`
+                    px-4 py-2 text-sm font-semibold
+                    border-2 border-[var(--border)]
+                    rounded-lg
+                    transition-colors
+                    ${
+                      target === opt
+                        ? 'bg-[var(--primary)]'
+                        : 'bg-transparent hover:bg-[var(--secondary)]'
+                    }
+                  `}
                 >
                   {opt}
                 </button>
               ))}
             </div>
-            <p
-              style={{
-                fontSize: '11px',
-                color: 'var(--text-muted)',
-                marginTop: '8px',
-              }}
-            >
+            <p className="text-xs text-[var(--text-muted)] mt-3">
               {Math.round(progress * 100)}% complete today
             </p>
           </div>

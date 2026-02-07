@@ -39,6 +39,31 @@ interface TaskListProps {
   onIncrementPomodoroRef?: (fn: () => void) => void
 }
 
+function EmptyState() {
+  return (
+    <div className="text-center py-10 px-4">
+      <div className="w-14 h-14 mx-auto mb-3 rounded-xl bg-[var(--surface-secondary)] border-2 border-[var(--border)] flex items-center justify-center">
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-[var(--text-muted)]"
+        >
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+        </svg>
+      </div>
+      <p className="text-[var(--text-muted)] font-medium text-sm">No tasks yet</p>
+      <p className="text-xs text-[var(--text-muted)] mt-1">Add a task to get started</p>
+    </div>
+  )
+}
+
 export function TaskList({ onSelectedTaskChange, onAddTaskRef, onIncrementPomodoroRef }: TaskListProps) {
   const [tasks, setTasks] = useState<Task[]>(loadTasks)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(loadSelectedTaskId)
@@ -158,20 +183,23 @@ export function TaskList({ onSelectedTaskChange, onAddTaskRef, onIncrementPomodo
   }
 
   return (
-    <Card className="py-8 px-8">
-      <div className="flex items-center justify-between mb-10">
-        <h2 className="text-2xl">Tasks</h2>
+    <Card className="p-6">
+      {/* Header row: Tasks left, Add Task right */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold">Tasks</h2>
         {!isAdding && (
           <Button
             variant="secondary"
             size="sm"
             onClick={() => setIsAdding(true)}
+            className="h-9"
           >
             + Add Task
           </Button>
         )}
       </div>
 
+      {/* Add task form */}
       {isAdding && (
         <div className="flex gap-2 mb-4">
           <Input
@@ -181,28 +209,29 @@ export function TaskList({ onSelectedTaskChange, onAddTaskRef, onIncrementPomodo
             onChange={(e) => setNewTaskText(e.target.value)}
             onKeyDown={handleKeyDown}
             autoFocus
+            className="flex-1"
           />
-          <Button variant="primary" size="md" onClick={addTask}>
+          <Button variant="primary" size="sm" onClick={addTask} className="h-11">
             Add
           </Button>
           <Button
             variant="outline"
-            size="md"
+            size="sm"
             onClick={() => {
               setIsAdding(false)
               setNewTaskText('')
             }}
+            className="h-11"
           >
             Cancel
           </Button>
         </div>
       )}
 
-      <div className="space-y-3">
+      {/* Task list */}
+      <div className="space-y-2">
         {tasks.length === 0 ? (
-          <p className="text-center text-[var(--text-muted)] py-6">
-            No tasks yet. Add one to get started!
-          </p>
+          <EmptyState />
         ) : (
           tasks.map((task, index) => (
             <TaskItem

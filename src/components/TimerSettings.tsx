@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import type { TimerSettings as TimerSettingsType } from '@/hooks/useTimerSettings'
 
 interface TimerSettingsProps {
+  isOpen: boolean
+  onClose: () => void
   settings: TimerSettingsType
   onPomodoroDurationChange: (minutes: number) => void
   onShortBreakDurationChange: (minutes: number) => void
@@ -19,7 +21,50 @@ const DURATION_PRESETS = {
 
 const POMODOROS_UNTIL_LONG_BREAK_OPTIONS = [2, 3, 4, 5, 6]
 
+function DurationSelector({
+  label,
+  currentValue,
+  options,
+  onChange,
+}: {
+  label: string
+  currentValue: number
+  options: number[]
+  onChange: (value: number) => void
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-2">
+        {label}: {currentValue} min
+      </label>
+      <div className="flex flex-wrap gap-2">
+        {options.map((value) => (
+          <button
+            key={value}
+            onClick={() => onChange(value)}
+            className={`
+              px-4 py-2 text-sm font-semibold
+              border-2 border-[var(--border)]
+              rounded-lg
+              transition-colors
+              ${
+                currentValue === value
+                  ? 'bg-[var(--primary)]'
+                  : 'bg-transparent hover:bg-[var(--secondary)]'
+              }
+            `}
+          >
+            {value}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function TimerSettings({
+  isOpen,
+  onClose,
   settings,
   onPomodoroDurationChange,
   onShortBreakDurationChange,
@@ -27,157 +72,72 @@ export function TimerSettings({
   onPomodorosUntilLongBreakChange,
   onResetToDefaults,
 }: TimerSettingsProps) {
-  const [isOpen, setIsOpen] = useState(false)
-
   const pomodoroMinutes = Math.round(settings.pomodoro / 60)
   const shortBreakMinutes = Math.round(settings.shortBreak / 60)
   const longBreakMinutes = Math.round(settings.longBreak / 60)
 
   return (
-    <div className="relative inline-block">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        Timer Settings
-      </Button>
+    <Modal isOpen={isOpen} onClose={onClose} title="Timer Settings">
+      <div className="space-y-6">
+        <DurationSelector
+          label="Pomodoro"
+          currentValue={pomodoroMinutes}
+          options={DURATION_PRESETS.pomodoro}
+          onChange={onPomodoroDurationChange}
+        />
 
-      {isOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
-          <div
-            className="absolute right-0 top-full mt-2 z-50 p-4 min-w-[280px]"
-            style={{
-              backgroundColor: 'var(--card-bg)',
-              border: '3px solid var(--border)',
-              boxShadow: 'var(--shadow)',
-            }}
-          >
-            <h3 className="font-bold mb-4 text-lg">Timer Durations</h3>
+        <DurationSelector
+          label="Short Break"
+          currentValue={shortBreakMinutes}
+          options={DURATION_PRESETS.shortBreak}
+          onChange={onShortBreakDurationChange}
+        />
 
-            {/* Pomodoro Duration */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Pomodoro: {pomodoroMinutes} min
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {DURATION_PRESETS.pomodoro.map((min) => (
-                  <button
-                    key={min}
-                    onClick={() => onPomodoroDurationChange(min)}
-                    style={{
-                      padding: '4px 10px',
-                      fontSize: '13px',
-                      backgroundColor: pomodoroMinutes === min ? 'var(--primary)' : 'transparent',
-                      border: '2px solid var(--border)',
-                      cursor: 'pointer',
-                      color: 'var(--foreground)',
-                    }}
-                  >
-                    {min}
-                  </button>
-                ))}
-              </div>
-            </div>
+        <DurationSelector
+          label="Long Break"
+          currentValue={longBreakMinutes}
+          options={DURATION_PRESETS.longBreak}
+          onChange={onLongBreakDurationChange}
+        />
 
-            {/* Short Break Duration */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Short Break: {shortBreakMinutes} min
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {DURATION_PRESETS.shortBreak.map((min) => (
-                  <button
-                    key={min}
-                    onClick={() => onShortBreakDurationChange(min)}
-                    style={{
-                      padding: '4px 10px',
-                      fontSize: '13px',
-                      backgroundColor: shortBreakMinutes === min ? 'var(--primary)' : 'transparent',
-                      border: '2px solid var(--border)',
-                      cursor: 'pointer',
-                      color: 'var(--foreground)',
-                    }}
-                  >
-                    {min}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Long Break Duration */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Long Break: {longBreakMinutes} min
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {DURATION_PRESETS.longBreak.map((min) => (
-                  <button
-                    key={min}
-                    onClick={() => onLongBreakDurationChange(min)}
-                    style={{
-                      padding: '4px 10px',
-                      fontSize: '13px',
-                      backgroundColor: longBreakMinutes === min ? 'var(--primary)' : 'transparent',
-                      border: '2px solid var(--border)',
-                      cursor: 'pointer',
-                      color: 'var(--foreground)',
-                    }}
-                  >
-                    {min}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Pomodoros until long break */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Long break after: {settings.pomodorosUntilLongBreak} pomodoros
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {POMODOROS_UNTIL_LONG_BREAK_OPTIONS.map((count) => (
-                  <button
-                    key={count}
-                    onClick={() => onPomodorosUntilLongBreakChange(count)}
-                    style={{
-                      padding: '4px 10px',
-                      fontSize: '13px',
-                      backgroundColor: settings.pomodorosUntilLongBreak === count ? 'var(--primary)' : 'transparent',
-                      border: '2px solid var(--border)',
-                      cursor: 'pointer',
-                      color: 'var(--foreground)',
-                    }}
-                  >
-                    {count}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div
-              style={{
-                height: '2px',
-                backgroundColor: 'var(--border)',
-                margin: '12px 0',
-              }}
-            />
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onResetToDefaults}
-              className="w-full"
-            >
-              Reset to Defaults
-            </Button>
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Long break after: {settings.pomodorosUntilLongBreak} pomodoros
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {POMODOROS_UNTIL_LONG_BREAK_OPTIONS.map((count) => (
+              <button
+                key={count}
+                onClick={() => onPomodorosUntilLongBreakChange(count)}
+                className={`
+                  px-4 py-2 text-sm font-semibold
+                  border-2 border-[var(--border)]
+                  rounded-lg
+                  transition-colors
+                  ${
+                    settings.pomodorosUntilLongBreak === count
+                      ? 'bg-[var(--primary)]'
+                      : 'bg-transparent hover:bg-[var(--secondary)]'
+                  }
+                `}
+              >
+                {count}
+              </button>
+            ))}
           </div>
-        </>
-      )}
-    </div>
+        </div>
+
+        <div className="h-0.5 bg-[var(--border)]" />
+
+        <Button
+          variant="outline"
+          size="md"
+          onClick={onResetToDefaults}
+          className="w-full"
+        >
+          Reset to Defaults
+        </Button>
+      </div>
+    </Modal>
   )
 }

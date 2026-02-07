@@ -1,20 +1,21 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode
+interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  icon: ReactNode
   variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'success'
   size?: 'sm' | 'md' | 'lg'
+  'aria-label': string
 }
 
-export function Button({
-  children,
-  variant = 'primary',
+export function IconButton({
+  icon,
+  variant = 'secondary',
   size = 'md',
   className = '',
   ...props
-}: ButtonProps) {
+}: IconButtonProps) {
   const baseStyles = `
-    font-[var(--font-body)] font-semibold
+    flex items-center justify-center
     border-2 border-[var(--border)]
     rounded-xl
     transition-all duration-100
@@ -24,17 +25,17 @@ export function Button({
   `
 
   const variants = {
-    primary: 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] shadow-[4px_4px_0_var(--border)]',
-    secondary: 'bg-[var(--secondary)] hover:bg-[var(--primary)] shadow-[4px_4px_0_var(--border)]',
-    outline: 'bg-transparent hover:bg-[var(--secondary)] shadow-[4px_4px_0_var(--border)]',
-    danger: 'bg-[var(--danger)] hover:opacity-90 shadow-[4px_4px_0_var(--border)] text-white',
-    success: 'bg-[var(--success)] hover:opacity-90 shadow-[4px_4px_0_var(--border)] text-white',
+    primary: 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] shadow-[3px_3px_0_var(--border)]',
+    secondary: 'bg-[var(--secondary)] hover:bg-[var(--primary)] shadow-[3px_3px_0_var(--border)]',
+    outline: 'bg-transparent hover:bg-[var(--secondary)] shadow-[3px_3px_0_var(--border)]',
+    danger: 'bg-[var(--danger)] hover:opacity-90 shadow-[3px_3px_0_var(--border)] text-white',
+    success: 'bg-[var(--success)] hover:opacity-90 shadow-[3px_3px_0_var(--border)] text-white',
   }
 
   const sizes = {
-    sm: 'h-9 px-3 text-sm',
-    md: 'h-11 px-5 text-base',
-    lg: 'h-12 px-8 text-lg',
+    sm: 'w-9 h-9',
+    md: 'w-11 h-11',
+    lg: 'w-12 h-12',
   }
 
   return (
@@ -42,7 +43,7 @@ export function Button({
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
-      {children}
+      {icon}
     </button>
   )
 }

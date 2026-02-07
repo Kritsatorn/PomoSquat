@@ -9,19 +9,20 @@ import { useTheme } from '@/hooks/useTheme'
 import { useTimerSettings } from '@/hooks/useTimerSettings'
 import { useStatistics } from '@/hooks/useStatistics'
 import { useDailyGoals } from '@/hooks/useDailyGoals'
-import { Timer } from '@/components/Timer'
-import { ModeSelector } from '@/components/ModeSelector'
+import { Header } from '@/components/Header'
+import { FocusPanel } from '@/components/FocusPanel'
 import { TaskList } from '@/components/TaskList'
-import { SquatTimer } from '@/components/SquatTimer'
+import { SquatPanel } from '@/components/SquatPanel'
 import { AlarmOverlay } from '@/components/AlarmOverlay'
-import { ThemeToggle } from '@/components/ThemeToggle'
-import { TimerSettings } from '@/components/TimerSettings'
 import { Statistics } from '@/components/Statistics'
-import { DailyGoalIndicator } from '@/components/DailyGoalIndicator'
+import { TimerSettings } from '@/components/TimerSettings'
 import type { Task } from '@/types'
 
 function App() {
   const { isDark, toggleTheme } = useTheme()
+
+  const [showStats, setShowStats] = useState(false)
+  const [showTimerSettings, setShowTimerSettings] = useState(false)
 
   const {
     settings: timerSettings,
@@ -79,7 +80,6 @@ function App() {
     setDailyTarget,
   } = useDailyGoals()
 
-  // State for task management callbacks
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [addTaskFn, setAddTaskFn] = useState<(() => void) | null>(null)
   const [incrementPomodoroFn, setIncrementPomodoroFn] = useState<(() => void) | null>(null)
@@ -88,11 +88,9 @@ function App() {
     showAlarm(completedMode)
     notifyTimerComplete(completedMode)
 
-    // Record the session in statistics
     const durationMinutes = Math.round(timerConfig[completedMode] / 60)
     recordSession(completedMode, durationMinutes)
 
-    // Increment pomodoro count for selected task
     if (completedMode === 'pomodoro') {
       incrementPomodoroFn?.()
     }
@@ -109,7 +107,6 @@ function App() {
     switchMode,
   } = useTimer({ config: timerConfig, onComplete: handleTimerComplete })
 
-  // Check if it's time for a long break
   const shouldSuggestLongBreak = session > 0 && session % timerSettings.pomodorosUntilLongBreak === 0
 
   const {
@@ -152,83 +149,101 @@ function App() {
   })
 
   return (
-    <div className="min-h-screen flex items-start justify-center pt-32 pb-12 px-4">
-      <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+    <div className="min-h-screen flex flex-col bg-[var(--background)]">
+      <Header
+        completed={todayStats?.pomodoros ?? 0}
+        dailyTarget={dailyTarget}
+        showDailyGoal={showDailyGoal}
+        isDark={isDark}
+        onTargetChange={setDailyTarget}
+        onToggleTheme={toggleTheme}
+        onOpenStats={() => setShowStats(true)}
+        onOpenSettings={() => setShowTimerSettings(true)}
+      />
 
-      <div className="w-full max-w-lg space-y-14">
-        <header className="text-center">
-          <h1 className="text-4xl mb-4">PomoSquat</h1>
-          <div className="flex justify-center items-center gap-2 mb-3">
-            <DailyGoalIndicator
-              completed={todayStats?.pomodoros ?? 0}
-              target={dailyTarget}
-              showIndicator={showDailyGoal}
-              onTargetChange={setDailyTarget}
+      {/* Centered page container */}
+      <main className="flex-1 w-full px-8 py-8 flex justify-center">
+        {/* Desktop: 2 columns with fixed widths, centered. Mobile: stacked */}
+        <div className="grid grid-cols-1 lg:grid-cols-[520px_360px] gap-8 items-start w-full max-w-[920px]">
+          {/* Left column: Timer + Tasks */}
+          <div className="space-y-8 order-1 w-full">
+            <FocusPanel
+              formattedTime={formattedTime}
+              isRunning={isRunning}
+              mode={mode}
+              progress={progress}
+              selectedTask={selectedTask}
+              onToggle={handleToggle}
+              onReset={reset}
+              onModeChange={switchMode}
+            />
+            {/* Tasks - show after Squat on mobile */}
+            <div className="hidden lg:block">
+              <TaskList
+                onSelectedTaskChange={handleSelectedTaskChange}
+                onAddTaskRef={handleAddTaskRef}
+                onIncrementPomodoroRef={handleIncrementPomodoroRef}
+              />
+            </div>
+          </div>
+
+          {/* Right column: Squat (sticky on desktop) */}
+          <div className="order-2 lg:sticky lg:top-6">
+            <SquatPanel
+              formattedTime={squatFormattedTime}
+              timeUntilSquat={timeUntilSquat}
+              isSquatTime={isSquatTime}
+              isDoingSquats={isDoingSquats}
+              squatInterval={squatSettings.squatInterval}
+              soundSettings={soundSettings}
+              notificationsEnabled={notificationsEnabled}
+              notificationsSupported={notificationsSupported}
+              onStartSquats={startSquats}
+              onCompleteSquats={completeSquats}
+              onConfigureInterval={configureInterval}
+              onToggleSoundEnabled={toggleEnabled}
+              onVolumeChange={setVolume}
+              onAlarmVolumeChange={setAlarmVolume}
+              onPomodoroSoundChange={setPomodoroSound}
+              onSquatSoundChange={setSquatSound}
+              onPreviewSound={previewSound}
+              onPlaySquatSound={playSquatSound}
+              onToggleNotifications={toggleNotifications}
             />
           </div>
-          <div className="flex justify-center gap-2">
-            <Statistics
-              totalPomodoros={statistics.totalPomodoros}
-              totalFocusMinutes={statistics.totalFocusMinutes}
-              currentStreak={statistics.currentStreak}
-              longestStreak={statistics.longestStreak}
-              todayStats={todayStats}
-              weekStats={weekStats}
-            />
-            <TimerSettings
-              settings={timerSettings}
-              onPomodoroDurationChange={setPomodoroDuration}
-              onShortBreakDurationChange={setShortBreakDuration}
-              onLongBreakDurationChange={setLongBreakDuration}
-              onPomodorosUntilLongBreakChange={setPomodorosUntilLongBreak}
-              onResetToDefaults={resetTimerSettings}
+
+          {/* Tasks - mobile only (after Squat) */}
+          <div className="order-3 lg:hidden">
+            <TaskList
+              onSelectedTaskChange={handleSelectedTaskChange}
+              onAddTaskRef={handleAddTaskRef}
+              onIncrementPomodoroRef={handleIncrementPomodoroRef}
             />
           </div>
-        </header>
+        </div>
+      </main>
 
-        <ModeSelector currentMode={mode} onModeChange={switchMode} />
+      <Statistics
+        isOpen={showStats}
+        onClose={() => setShowStats(false)}
+        totalPomodoros={statistics.totalPomodoros}
+        totalFocusMinutes={statistics.totalFocusMinutes}
+        currentStreak={statistics.currentStreak}
+        longestStreak={statistics.longestStreak}
+        todayStats={todayStats}
+        weekStats={weekStats}
+      />
 
-        <Timer
-          formattedTime={formattedTime}
-          isRunning={isRunning}
-          mode={mode}
-          progress={progress}
-          selectedTask={selectedTask}
-          onToggle={handleToggle}
-          onReset={reset}
-        />
-
-        <TaskList
-          onSelectedTaskChange={handleSelectedTaskChange}
-          onAddTaskRef={handleAddTaskRef}
-          onIncrementPomodoroRef={handleIncrementPomodoroRef}
-        />
-      </div>
-
-      {/* Squat Timer - Fixed to right side of screen */}
-      <div className="fixed right-4 top-1/2 -translate-y-1/2">
-        <SquatTimer
-          formattedTime={squatFormattedTime}
-          timeUntilSquat={timeUntilSquat}
-          isSquatTime={isSquatTime}
-          isDoingSquats={isDoingSquats}
-          squatInterval={squatSettings.squatInterval}
-          soundSettings={soundSettings}
-          notificationsEnabled={notificationsEnabled}
-          notificationsSupported={notificationsSupported}
-          onStartSquats={startSquats}
-          onCompleteSquats={completeSquats}
-          onConfigureInterval={configureInterval}
-          onToggleSoundEnabled={toggleEnabled}
-          onVolumeChange={setVolume}
-          onAlarmVolumeChange={setAlarmVolume}
-          onPomodoroSoundChange={setPomodoroSound}
-          onSquatSoundChange={setSquatSound}
-          onPreviewSound={previewSound}
-          onPlaySquatSound={playSquatSound}
-          onToggleNotifications={toggleNotifications}
-        />
-      </div>
+      <TimerSettings
+        isOpen={showTimerSettings}
+        onClose={() => setShowTimerSettings(false)}
+        settings={timerSettings}
+        onPomodoroDurationChange={setPomodoroDuration}
+        onShortBreakDurationChange={setShortBreakDuration}
+        onLongBreakDurationChange={setLongBreakDuration}
+        onPomodorosUntilLongBreakChange={setPomodorosUntilLongBreak}
+        onResetToDefaults={resetTimerSettings}
+      />
 
       <AlarmOverlay
         isActive={isAlarmActive}

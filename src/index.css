@@ -2,20 +2,38 @@
 
 /* RetroUI Theme Variables - Yellow/Black NeoBrutalism */
 :root {
-  --background: #fef3c7;
-  --foreground: #1c1917;
-  --primary: #fbbf24;
-  --primary-hover: #f59e0b;
+  /* Updated base colors */
+  --background: #fafafa;        /* zinc-50 */
+  --foreground: #09090b;        /* zinc-950 */
+  --surface: #ffffff;
+  --surface-secondary: #f4f4f5; /* zinc-100 */
+
+  /* Accent colors */
+  --primary: #fbbf24;           /* amber-400 */
+  --primary-hover: #f59e0b;     /* amber-500 */
   --secondary: #fde68a;
-  --border: #1c1917;
-  --shadow: 4px 4px 0px #1c1917;
-  --shadow-sm: 2px 2px 0px #1c1917;
+
+  /* Semantic colors */
+  --success: #34d399;           /* emerald-400 */
+  --danger: #fb7185;            /* rose-400 */
+
+  /* Border */
+  --border: #09090b;            /* zinc-950 */
+
+  /* Updated shadows */
+  --shadow: 6px 6px 0px #09090b;
+  --shadow-lg: 8px 8px 0px #09090b;
+  --shadow-sm: 2px 2px 0px #09090b;
+
+  /* Border radius */
+  --radius-lg: 1rem;            /* 16px - cards */
+  --radius-md: 0.75rem;         /* 12px - buttons */
   --radius: 0px;
 
   /* Card and surface colors */
   --card-bg: #ffffff;
   --card-secondary: #fde68a;
-  --input-bg: #fef3c7;
+  --input-bg: #fafafa;
   --text-muted: #6b7280;
 
   /* Font families */
@@ -25,19 +43,33 @@
 
 /* Dark Theme */
 [data-theme="dark"] {
-  --background: #1c1917;
-  --foreground: #fef3c7;
+  /* Updated base colors */
+  --background: #09090b;        /* zinc-950 */
+  --foreground: #fafafa;        /* zinc-50 */
+  --surface: #18181b;           /* zinc-900 */
+  --surface-secondary: #27272a; /* zinc-800 */
+
+  /* Accent colors */
   --primary: #fbbf24;
   --primary-hover: #f59e0b;
   --secondary: #44403c;
-  --border: #fef3c7;
-  --shadow: 4px 4px 0px #fef3c7;
-  --shadow-sm: 2px 2px 0px #fef3c7;
+
+  /* Semantic colors */
+  --success: #34d399;
+  --danger: #fb7185;
+
+  /* Border */
+  --border: #fafafa;
+
+  /* Updated shadows */
+  --shadow: 6px 6px 0px #fafafa;
+  --shadow-lg: 8px 8px 0px #fafafa;
+  --shadow-sm: 2px 2px 0px #fafafa;
 
   /* Card and surface colors */
-  --card-bg: #292524;
-  --card-secondary: #44403c;
-  --input-bg: #292524;
+  --card-bg: #18181b;           /* zinc-900 */
+  --card-secondary: #27272a;    /* zinc-800 */
+  --input-bg: #18181b;
   --text-muted: #a8a29e;
 }
 
